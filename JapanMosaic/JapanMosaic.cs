@@ -109,7 +109,7 @@ namespace JapanMosaic
 
 			return text;
 
-			ECellsStates[ , ] Slice ( ECellsStates[,,] arr, int floor )
+			ECellsStates[ , ] Slice ( ECellsStates[ , , ] arr, int floor )
 			{
 				int i, j;
 				var slice = new ECellsStates[ RowCount, ColCount ];

@@ -104,12 +104,12 @@ namespace JapanMosaic
 
 			for ( k = 0; k < NumCount; k++ )
 			{
-				WriteLine( ArrayConverter.Convert( Slice( ), e => ( char ) e ) + "\n" );
+				WriteLine( ArrayConverter.Convert( Slice( cellsVariants, k ), e => ( char ) e ) + "\n" );
 			}
 
 			return text;
 
-			ECellsStates[ , ] Slice ( )
+			ECellsStates[ , ] Slice ( ECellsStates[,,] arr, int floor )
 			{
 				int i, j;
 				var slice = new ECellsStates[ RowCount, ColCount ];
@@ -118,7 +118,7 @@ namespace JapanMosaic
 				{
 					for ( j = 0; j < ColCount; j++ )
 					{
-						slice[ i, j ] = cellsVariants[ k, i, j ];
+						slice[ i, j ] = cellsVariants[ floor, i, j ];
 					}
 				}
 

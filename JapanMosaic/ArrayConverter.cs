@@ -121,9 +121,9 @@ namespace JapanMosaic
 
                 var text = "║" + increment + "║" + array[ 0, 0 ];
 
-                for ( i = 1; i < colCount; i++ )
+                for ( j = 1; j < colCount; j++ )
                 {
-                    text += "│" + array[ i, 0 ];
+                    text += "│" + array[ 0, j ];
                 }
 
                 text += "║\n";
@@ -152,9 +152,9 @@ namespace JapanMosaic
 
                 var text = "║" + increment + "║" + convert( array[ 0, 0 ] );
 
-                for ( i = 1; i < colCount; i++ )
+                for ( j = 1; j < colCount; j++ )
                 {
-                    text += "│" + convert( array[ i, 0 ] );
+                    text += "│" + convert( array[ 0, j ] );
                 }
 
                 text += "║\n";

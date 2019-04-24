@@ -11,10 +11,43 @@ namespace JapanMosaic
 	{
 		static void Main ( string[ ] args )
 		{
-			var a = new[ ] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
-			var t = ArrayConverter.Convert( a, c => c % 2 == 0 ? 'T' : 'F' );
-			WriteLine( t );
+			var conditionString = new[] {
+				"  343 0",
+				"25 76  ",
+				"4 7  1 ",
+				"4678764"
+			};
+
+			var condition = Convert( conditionString );
+
+			new JapanMosaic( condition ).Show( );
+
 			ReadKey( );
+		}
+
+		static ECellsStates[ , ] Convert ( string[] text )
+		{
+			var rowCount = text.Length;
+			var colCount = text[ 0 ].Length;
+			var cellStates = new ECellsStates[ rowCount, colCount ];
+			int i, j;
+
+			for ( i = 0; i < rowCount; i++ )
+			{
+				for ( j = 0; j < colCount; j++ )
+				{
+					if ( text[i][j] == ' ' )
+					{
+						cellStates[ i, j ] = ECellsStates.none;
+					}
+					else
+					{
+						cellStates[ i, j ] = (ECellsStates) Enum.GetValues( typeof( ECellsStates ) ).GetValue( System.Convert.ToInt32( text[ i ][ j ].ToString() ) + 1 );
+					}
+				}
+			}
+
+			return cellStates;
 		}
 	}
 }

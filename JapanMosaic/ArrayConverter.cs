@@ -1,129 +1,205 @@
-﻿using System;
-using System.Linq;
-using System.Text;
+using System;
 
 namespace JapanMosaic
 {
-	public static class ArrayConverter
-	{
-		private const int increment = 0;
+    public static class ArrayConverter
+    {
+        private const int increment = 0;
 
-		public static string Convert<T> ( T[ ] array, Func<T, char> convert = null )
-		{
-			if ( array is null )
-			{
-				throw new ArgumentNullException( @"In ArrayConverter.Convert() argument ""array"" is '=' null" );
-			}
+        public static string Convert<T> ( T[ ] array, Func<T, char> convert = null )
+        {
+            if ( array is null )
+            {
+                throw new ArgumentNullException( @"In ArrayConverter.Convert() argument ""array"" is '=' null" );
+            }
 
-			var headerNumbers = GenerateHeaderNumbers( array.Length );
-			var dataRow = convert is null ? GenerateRow( ) : GenerateConvertRow( );
-			var bottomLine = GenerateBottomLine( array.Length );
+            var headerNumbers = GenerateHeaderNumbers( );
+            var dataRow = convert is null ? GenerateRow( ) : GenerateConvertRow( );
+            var bottomLine = GenerateBottomLine( );
 
-			return headerNumbers + dataRow + bottomLine;
+            return headerNumbers + dataRow + bottomLine;
 
-			string GenerateRow ( )
-			{
-				var row = "║ ║";
+            string GenerateHeaderNumbers ( )
+            {
+                var upperLine = "╔═";
+                var middleLine = "║" + increment;
+                var lowerLine = "╠═";
 
-				foreach ( var item in array )
-				{
-					row += item + "│";
-				}
+                for ( int i = 1; i < array.Length; i++ )
+                {
+                    upperLine += "╦═";
+                    middleLine += "║" + ( i + increment ) % 10;
+                    lowerLine += "╬═";
+                }
 
-				row = row.Substring( 0, row.Length - 1 ) + "║\n";
+                upperLine += "╗\n";
+                middleLine += "║\n";
+                lowerLine += "╣\n";
 
-				return row;
-			}
+                return upperLine + middleLine + lowerLine;
+            }
 
-			string GenerateConvertRow ( )
-			{
-				var row = "║ ║";
+            string GenerateRow ( )
+            {
+                var row = "║" + array[ 0 ];
 
-				foreach ( var item in array )
-				{
-					row += convert( item ) + "│";
-				}
+                for ( var i = 1; i < array.Length; i++ )
+                {
+                    row += "│" + array[ i ];
+                }
 
-				row = row.Substring( 0, row.Length - 1 ) + "║\n";
+                return row + "║\n";
+            }
 
-				return row;
-			}
-		}
+            string GenerateConvertRow ( )
+            {
+                var row = "║" + convert( array[ 0 ] );
 
-		public static string Convert<T> ( T[ , ] array, Func<T, char> convert = null )
-		{
-			if ( array is null )
-			{
-				throw new ArgumentNullException( @"In ArrayConverter.Convert() argument ""array"" is '=' null" );
-			}
+                for ( var i = 1; i < array.Length; i++ )
+                {
+                    row += "│" + convert( array[ i ] );
+                }
 
-			var headerNumbers = GenerateHeaderNumbers( array.Length );
-			var dataRow = convert is null ? GenerateRows( ) : GenerateConvertRows( );
-			var bottomLine = GenerateBottomLine( array.Length );
+                return row + "║\n";
+            }
 
-			return headerNumbers + dataRow + bottomLine;
+            string GenerateBottomLine ( )
+            {
+                var line = "╚═";
 
-			string GenerateRows ( )
-			{
-				var row = "║ ║";
+                for ( int i = 1; i < array.Length; i++ )
+                {
+                    line += "╩═";
+                }
 
-				foreach ( var item in array )
-				{
-					row += item + "│";
-				}
+                line += "╝\n";
 
-				row = row.Substring( 0, row.Length - 1 ) + "║\n";
+                return line;
+            }
+        }
 
-				return row;
-			}
+        public static string Convert<T> ( T[ , ] array, Func<T, char> convert = null )
+        {
+            if ( array is null )
+            {
+                throw new ArgumentNullException( @"In ArrayConverter.Convert() argument ""array"" is '=' null" );
+            }
 
-			string GenerateConvertRows ( )
-			{
-				var row = "║ ║";
+            var rowCount = array.GetLength( 0 );
+            var colCount = array.GetLength( 1 );
+            var headerNumbers = GenerateHeaderNumbers( );
+            var dataRow = convert is null ? GenerateRows( ) : GenerateConvertRows( );
+            var bottomLine = GenerateBottomLine( );
 
-				foreach ( var item in array )
-				{
-					row += convert( item ) + "│";
-				}
+            return headerNumbers + dataRow + bottomLine;
 
-				row = row.Substring( 0, row.Length - 1 ) + "║\n";
+            string GenerateHeaderNumbers ( )
+            {
+                var upperLine = "╔═";
+                var middleLine = "║ ";
+                var lowerLine = "╠═";
 
-				return row;
-			}
-		}
+                for ( int i = 0; i < colCount; i++ )
+                {
+                    upperLine += "╦═";
+                    middleLine += "║" + ( i + increment ) % 10;
+                    lowerLine += "╬═";
+                }
 
-		private static string GenerateHeaderNumbers ( int length )
-		{	
-			var upperLine = "╔═";
-			var middleLine = "║ ";
-			var lowerLine = "╠═";
+                upperLine += "╗\n";
+                middleLine += "║\n";
+                lowerLine += "╣\n";
 
-			for ( int i = 0; i < length; i++ )
-			{
-				upperLine += "╦═";
-				middleLine += "║" + ( i + increment ) % 10;
-				lowerLine += "╬═";
-			}
+                return upperLine + middleLine + lowerLine;
+            }
 
-			upperLine += "╗\n";
-			middleLine += "║\n";
-			lowerLine += "╣\n";
+            string GenerateRows ( )
+            {
+                var horizontalLine = GenerateHorizontalLine( );
+                int numberRow;
+                int i, j;
 
-			return upperLine + middleLine + lowerLine;
-		}
+                var text = "║" + increment + "║" + array[ 0, 0 ];
 
-		private static string GenerateBottomLine ( int length )
-		{	
-			var line = "╚═";
+                for ( i = 1; i < colCount; i++ )
+                {
+                    text += "│" + array[ i, 0 ];
+                }
 
-			for ( int i = 0; i < length; i++ )
-			{
-				line += "╩═";
-			}
+                text += "║\n";
 
-			line += "╝\n";
+                for ( i = 1; i < rowCount; i++ )
+                {
+                    numberRow = ( i + increment ) % 10;
+                    text += horizontalLine + "║" + numberRow + "║" + array[ i, 0 ];
 
-			return line;
-		}
-	}
+                    for ( j = 1; j < colCount; j++ )
+                    {
+                        text += "│" + array[ i, j ];
+                    }
+
+                    text += "║\n";
+                }
+
+                return text;
+            }
+
+            string GenerateConvertRows ( )
+            {
+                var horizontalLine = GenerateHorizontalLine( );
+                int numberRow;
+                int i, j;
+
+                var text = "║" + increment + "║" + convert( array[ 0, 0 ] );
+
+                for ( i = 1; i < colCount; i++ )
+                {
+                    text += "│" + convert( array[ i, 0 ] );
+                }
+
+                text += "║\n";
+
+                for ( i = 1; i < rowCount; i++ )
+                {
+                    numberRow = ( i + increment ) % 10;
+                    text += horizontalLine + "║" + numberRow + "║" + convert( array[ i, 0 ] );
+
+                    for ( j = 1; j < colCount; j++ )
+                    {
+                        text += "│" + convert( array[ i, j ] );
+                    }
+
+                    text += "║\n";
+                }
+
+                return text;
+            }
+
+            string GenerateHorizontalLine ( )
+            {
+                var line = "╠═╬─";
+
+                for ( int i = 1; i < colCount; i++ )
+                {
+                    line += "┼─";
+                }
+
+                return line + "╣\n";
+            }
+
+            string GenerateBottomLine ( )
+            {
+                var line = "╚═";
+
+                for ( int i = 0; i < colCount; i++ )
+                {
+                    line += "╩═";
+                }
+
+                line += "╝\n";
+
+                return line;
+            }
+        }
+    }
 }

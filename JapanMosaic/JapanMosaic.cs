@@ -41,7 +41,7 @@ namespace JapanMosaic
 		{
 			cellsVariants = new ECellsStates[ NumCount, RowCount, ColCount ];
 
-			GenerateVariantsCells( );
+			GenerateCellsVariants( );
 			ClearZeroCells( );
 			FindSolve( );
 
@@ -49,7 +49,7 @@ namespace JapanMosaic
 
 			void FindSolve ( )
 			{
-				var towerLinghts = new int[ RowCount, ColCount ];
+				var towersHeights = new int[ RowCount, ColCount ];
 				int i, j, k;
 
 				for ( i = 0; i < RowCount; i++ )
@@ -60,21 +60,23 @@ namespace JapanMosaic
 						{
 							if ( cellsVariants[ k, i, j ] != ECellsStates.none )
 							{
-								towerLinghts[ i, j ]++;
+								towersHeights[ i, j ]++;
 							}
 						}
 					}
 				}
 
-				WriteLine( ArrayConverter.Convert( towerLinghts ) );
+				WriteLine( ArrayConverter.Convert( towersHeights ) );
 			}
 
-			void GenerateVariantsCells ( )
+			void GenerateCellsVariants ( )
 			{
 				int i, j;
 				int prevI, prevJ, nextI, nextJ;
 				ECellsStates cellState;
 				var floorsIndexes = new int[ RowCount, ColCount ];
+
+				GenerateDefaultValues( );
 
 				for ( i = 0; i < RowCount; i++ )
 				{
@@ -134,12 +136,28 @@ namespace JapanMosaic
 					}
 				}
 
+				void GenerateDefaultValues()
+				{
+					int k;
+					
+					for ( k = 0; k < NumCount; k++ )
+					{
+						for ( i = 0; i < RowCount; i++ )
+						{
+							for ( j = 0; j < ColCount; j++ )
+							{
+								cellsVariants[ k, i, j ] = ECellsStates.none;
+							}
+						}
+					}
+				}
+
 				void markedCell ( int row, int col )
 				{
 					if ( cellState != ECellsStates.num0 )
 					{
-						var floorIndex = floorsIndexes[ row, col ];
-						//var floorIndex = int.Parse( ( ( char ) cellState ).ToString() ) - 1;
+						//var floorIndex = floorsIndexes[ row, col ];
+						var floorIndex = int.Parse( ( ( char ) cellState ).ToString() ) - 1;
 						cellsVariants[ floorIndex, row, col ] = cellState;
 						floorsIndexes[ row, col ]++;
 					}

@@ -29,7 +29,7 @@ namespace JapanMosaic
 			var condition = Convert( conditionString );
 			var japanMosaic = new JapanMosaic( condition );
 			japanMosaic.Solve( );
-			japanMosaic.Show( );
+			//japanMosaic.Show( );
 
 			ReadKey( );
 		}

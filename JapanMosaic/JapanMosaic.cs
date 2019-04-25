@@ -35,65 +35,183 @@ namespace JapanMosaic
 			}
 
 			solve = condition;
+		}
+
+		public ECellsStates[ , ] Solve ( )
+		{
 			cellsVariants = new ECellsStates[ NumCount, RowCount, ColCount ];
 
-			int i, j;
-			int prevI, prevJ, nextI, nextJ;
-			ECellsStates cellState;
-			var floorsIndexes = new int[ RowCount, ColCount ];
+			GenerateVariantsCells( );
+			ClearZeroCells( );
+			FindSolve( );
 
-			for ( i = 0; i < RowCount; i++ )
+			return solve;
+
+			void FindSolve ( )
 			{
-				for ( j = 0; j < ColCount; j++ )
+				var towerLinghts = new int[ RowCount, ColCount ];
+				int i, j, k;
+
+				for ( i = 0; i < RowCount; i++ )
 				{
-					cellState = condition[ i, j ];
-
-					if ( cellState != ECellsStates.none )
+					for ( j = 0; j < ColCount; j++ )
 					{
-						prevI = i - 1;
-						prevJ = j - 1;
-						nextI = i + 1;
-						nextJ = j + 1;
-
-						switch ( 0 )
+						for ( k = 0; k < NumCount; k++ )
 						{
-							case 0 when prevI > -1 && prevJ > -1:
-								markedCell( prevI, prevJ );
-								break;
-							case 0 when prevI > -1:
-								markedCell( prevI, j );
-								break;
-							case 0 when prevI > -1 && nextJ < ColCount:
-								markedCell( prevI, nextJ );
-								break;
-							case 0 when prevJ > -1:
-								markedCell( i, prevJ );
-								break;
-							case 0 when nextJ < ColCount:
-								markedCell( i, nextJ );
-								break;
-							case 0 when nextI < RowCount && prevJ > -1:
-								markedCell( nextI, prevJ );
-								break;
-							case 0 when nextI < RowCount:
-								markedCell( nextI, j );
-								break;
-							case 0 when nextI < RowCount && nextJ < ColCount:
-								markedCell( nextI, prevJ );
-								break;
-							default:
-								markedCell( i, j );
-								break;
+							if ( cellsVariants[ k, i, j ] != ECellsStates.none )
+							{
+								towerLinghts[ i, j ]++;
+							}
 						}
 					}
 				}
+
+				WriteLine( ArrayConverter.Convert( towerLinghts ) );
 			}
 
-			void markedCell ( int row, int col )
+			void GenerateVariantsCells ( )
 			{
-				var floorIndex = floorsIndexes[ row, col ];
-				cellsVariants[ floorIndex, row, col ] = cellState;
-				floorsIndexes[ row, col ]++;
+				int i, j;
+				int prevI, prevJ, nextI, nextJ;
+				ECellsStates cellState;
+				var floorsIndexes = new int[ RowCount, ColCount ];
+
+				for ( i = 0; i < RowCount; i++ )
+				{
+					for ( j = 0; j < ColCount; j++ )
+					{
+						cellState = solve[ i, j ];
+
+						if ( cellState != ECellsStates.none )
+						{
+							prevI = i - 1;
+							prevJ = j - 1;
+							nextI = i + 1;
+							nextJ = j + 1;
+
+							if ( prevI > -1 )
+							{
+								if ( prevJ > -1 )
+								{
+									markedCell( prevI, prevJ );
+								}
+
+								markedCell( prevI, j );
+
+								if ( nextJ < ColCount )
+								{
+									markedCell( prevI, nextJ );
+								}
+							}
+
+							if ( prevJ > -1 )
+							{
+								markedCell( i, prevJ );
+							}
+
+							markedCell( i, j );
+
+							if ( nextJ < ColCount )
+							{
+								markedCell( i, nextJ );
+							}
+
+							if ( nextI < RowCount )
+							{
+								if ( prevJ > -1 )
+								{
+									markedCell( nextI, prevJ );
+								}
+
+								markedCell( nextI, j );
+
+								if ( nextJ < ColCount )
+								{
+									markedCell( nextI, nextJ );
+								}
+							}
+						}
+					}
+				}
+
+				void markedCell ( int row, int col )
+				{
+					if ( cellState != ECellsStates.num0 )
+					{
+						var floorIndex = floorsIndexes[ row, col ];
+						//var floorIndex = int.Parse( ( ( char ) cellState ).ToString() ) - 1;
+						cellsVariants[ floorIndex, row, col ] = cellState;
+						floorsIndexes[ row, col ]++;
+					}
+
+					//var floorIndex = floorsIndexes[ row, col ];
+
+				}
+			}
+
+			void ClearZeroCells ( )
+			{
+				int prevI, prevJ, nextI, nextJ;
+				int i, j, k;
+
+				for ( i = 0; i < RowCount; i++ )
+				{
+					for ( j = 0; j < ColCount; j++ )
+					{
+						if ( solve[ i, j ] == ECellsStates.num0 )
+						{
+							for ( k = 0; k < NumCount; k++ )
+							{
+								prevI = i - 1;
+								prevJ = j - 1;
+								nextI = i + 1;
+								nextJ = j + 1;
+
+								if ( prevI > -1 )
+								{
+									if ( prevJ > -1 )
+									{
+										cellsVariants[ k, prevI, prevJ ] = ECellsStates.none;
+									}
+
+									cellsVariants[ k, prevI, j ] = ECellsStates.none;
+
+									if ( nextJ < ColCount )
+									{
+										cellsVariants[ k, prevI, nextJ ] = ECellsStates.none;
+									}
+								}
+
+								if ( prevJ > -1 )
+								{
+									cellsVariants[ k, i, prevJ ] = ECellsStates.none;
+								}
+
+								cellsVariants[ k, i, j ] = ECellsStates.none;
+
+								if ( nextJ < ColCount )
+								{
+									cellsVariants[ k, i, nextJ ] = ECellsStates.none;
+								}
+
+								if ( nextI < RowCount )
+								{
+									if ( prevJ > -1 )
+									{
+										cellsVariants[ k, nextI, prevJ ] = ECellsStates.none;
+									}
+
+									cellsVariants[ k, nextI, j ] = ECellsStates.none;
+
+									if ( nextJ < ColCount )
+									{
+										cellsVariants[ k, nextI, nextJ ] = ECellsStates.none;
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 
@@ -104,7 +222,7 @@ namespace JapanMosaic
 
 			for ( k = 0; k < NumCount; k++ )
 			{
-				WriteLine( ArrayConverter.Convert( Slice( cellsVariants, k ), e => ( char ) e ) + "\n" );
+				WriteLine( ArrayConverter.Convert( Slice( cellsVariants, k ), e => ( char ) e ) );
 			}
 
 			return text;
